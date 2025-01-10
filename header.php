@@ -42,44 +42,9 @@ if (!isset($_SESSION['fullname'])) {
   <!-- jQuery File -->
   <script src="assets/jquery/jquery.min.js"></script>
 
-  <!-- select2 File -->
-  <script src="assets/select2/select2.min.css" rel="stylesheet"></script>
+  <!-- select2 CSS File -->
+  <!-- <link src="assets/select2/select2.min.css" rel="stylesheet"></link> -->
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
-  <style>
-        /* Basic styles for the custom select */
-        .custom-select {
-            position: relative;
-            /* width: 300px; */
-        }
-        .custom-select-input {
-            width: 100%;
-            padding: 6px 36px 6px 12px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .custom-select-options {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            max-height: 150px;
-            overflow-y: auto;
-            z-index: 1000;
-            display: none;
-        }
-        .custom-select-options div {
-            padding: 10px;
-            cursor: pointer;
-        }
-        .custom-select-options div:hover {
-            background-color: #f0f0f0;
-        }
-    </style>
 
 </head>
 

@@ -317,3 +317,54 @@
   }
 
 })();
+
+// JavaScript for searchable select
+document.addEventListener("DOMContentLoaded", () => {
+  const selectContainer = document.querySelector(".custom-select");
+  const input = selectContainer.querySelector(".custom-select-input");
+  const options = selectContainer.querySelector(".custom-select-options");
+
+  let isOptionClicked = false;
+
+  // Show dropdown on focus
+  input.addEventListener("focus", () => {
+    options.style.display = "block";
+  });
+
+  // Prevent blur from closing dropdown when clicking on an option
+  options.addEventListener("mousedown", () => {
+    isOptionClicked = true;
+  });
+
+  input.addEventListener("blur", () => {
+    if (!isOptionClicked) {
+      options.style.display = "none";
+    }
+    isOptionClicked = false;
+  });
+
+  // Filter options based on input value
+  input.addEventListener("input", () => {
+    const filter = input.value.toLowerCase();
+    const items = options.querySelectorAll("div");
+
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      if (text.includes(filter)) {
+        item.classList.remove("hidden");
+      } else {
+        item.classList.add("hidden");
+      }
+    });
+  });
+
+  // Set input value on selecting an option
+  options.addEventListener("click", (event) => {
+    if (event.target.matches("div")) {
+      const selectedValue = event.target.getAttribute("data-value"); // Get data-value
+      input.value = event.target.textContent; // Set display value
+      input.dataset.value = selectedValue; // Store actual value in input's dataset
+      options.style.display = "none"; // Hide dropdown
+    }
+  });
+});

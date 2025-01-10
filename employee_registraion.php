@@ -99,9 +99,10 @@ $name = $employeeID = $role = $mobile = $email = $username = $password = "";
             <form class="row g-3" id="filter_form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
 
               <div class="row">
-                <!-- <div class="col-md-3">
-                  <select class="form-select js-example-basic-single" name="filter_emp" id="filterName">
-                    <option selected value="" disabled>Select Employee</option>
+
+                <div class="col-md-3 custom-select">
+                  <input type="text" class="custom-select-input form-select" placeholder="Select employee...">
+                  <div class="custom-select-options">
                     <?php
                     $sql = "SELECT * FROM employee";
                     $stmt = $conn->prepare($sql);
@@ -109,55 +110,10 @@ $name = $employeeID = $role = $mobile = $email = $username = $password = "";
                     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     foreach ($result as $row) {
                     ?>
-                      <option value="<?= $row['empID']; ?>"> <?= $row['name']; ?> </option>
+                      <div data-value="<?= $row['empID']; ?>"><?= $row['name']; ?></div>
                     <?php } ?>
-                  </select>
-                </div> -->
-
-                <div class="col-md-3 custom-select">
-                  <input type="text" class="form-select custom-select-input" placeholder="Select an option...">
-                  <div class="custom-select-options">
-                    <div data-value="AL">Alabama</div>
-                    <div data-value="WY">Wyoming</div>
-                    <div data-value="CA">California</div>
-                    <div data-value="NY">New York</div>
                   </div>
                 </div>
-
-                <script>
-                  $(document).ready(function() {
-                    $('.js-example-basic-single').select2();
-                  });
-
-                  // Custom Select2 Script
-                  document.addEventListener("DOMContentLoaded", () => {
-                    const selectContainer = document.querySelector(".custom-select");
-                    const input = selectContainer.querySelector(".custom-select-input");
-                    const options = selectContainer.querySelector(".custom-select-options");
-
-                    // Show/hide dropdown on focus/click
-                    input.addEventListener("focus", () => options.style.display = "block");
-                    input.addEventListener("blur", () => setTimeout(() => options.style.display = "none", 200));
-
-                    // Filter options based on input
-                    input.addEventListener("input", () => {
-                      const filter = input.value.toLowerCase();
-                      const items = options.querySelectorAll("div");
-                      items.forEach(item => {
-                        const text = item.textContent.toLowerCase();
-                        item.style.display = text.includes(filter) ? "block" : "none";
-                      });
-                    });
-
-                    // Handle option selection
-                    options.addEventListener("click", (event) => {
-                      if (event.target.matches("div")) {
-                        input.value = event.target.textContent;
-                        options.style.display = "none";
-                      }
-                    });
-                  });
-                </script>
 
                 <div class="col-md-3">
                   <select class="form-select" aria-label="Default select example" name="filter_role" id="filterRole">
