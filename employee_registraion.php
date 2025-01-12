@@ -156,15 +156,15 @@ $name = $employeeID = $role = $mobile = $email = $username = $password = "";
             <table class="table datatable" id="empTable">
               <thead>
                 <tr>
-                  <th><input type="checkbox" class="form-check-input"></th>
+                  <th data-sortable="false"></th>
                   <th>S No.</th>
                   <th>Employee Name</th>
                   <th>Role</th>
                   <th>Mobile</th>
                   <th>Email</th>
                   <th>Username</th>
-                  <th>Status</th>
-                  <th>Action</th>
+                  <th data-sortable="false">Status</th>
+                  <th data-sortable="false">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -187,7 +187,7 @@ $name = $employeeID = $role = $mobile = $email = $username = $password = "";
                   }
                 ?>
                   <tr class="<?php echo $bg; ?>">
-                    <td><input type="checkbox" class="form-check-input"></td>
+                    <td><input type="checkbox" class="form-check-input" name="empId[]" value="<?php echo $row['empID']; ?>"></td>
                     <td><?php echo $sn++; ?></td>
                     <td><?php echo $row['name']; ?></td>
                     <td><?php echo $row['rolename']; ?></td>
@@ -266,8 +266,12 @@ require 'footer.php';
 
           // Populate the table with new data
           employees.forEach(function(item) {
+            let bg = 'table-primary';
+            if (item.employee_status == 0) {
+              bg = 'table-danger';
+            }
             var row = `
-                        <tr>
+                        <tr class="${bg}">
                             <td><input type="checkbox" class="form-check-input"></td>
                             <td>${sn++}</td>
                             <td>${item.name}</td>
