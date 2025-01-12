@@ -22,11 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] == 'filterdata') {
     $department = $_POST['filter_dept'] ?? null;
 
     // Construct the base SQL query
-    $sql = "SELECT * FROM employee WHERE 1=1";
+    $sql = "SELECT * FROM employee INNER JOIN role ON role.roleID=employee.role WHERE 1=1";
 
     // Add conditions based on the selected filters
     if (!empty($emp_name)) {
-        $sql .= " AND empID = :emp_name";
+        $sql .= " AND name LIKE :emp_name";
     }
     if (!empty($role)) {
         $sql .= " AND role = :role";
@@ -40,7 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] == 'filterdata') {
 
     // Bind parameters
     if (!empty($emp_name)) {
-        $stmt->bindParam(':emp_name', $emp_name, PDO::PARAM_INT);
+        $emp_name = "%" . $emp_name . "%"; // Add wildcards for LIKE
+        $stmt->bindParam(':emp_name', $emp_name, PDO::PARAM_STR);
     }
     if (!empty($role)) {
         $stmt->bindParam(':role', $role, PDO::PARAM_INT);

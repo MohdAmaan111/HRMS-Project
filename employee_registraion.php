@@ -257,17 +257,36 @@ require 'footer.php';
 
       success: function(response) {
         if (response.length > 0) {
-          alert("working");
+          // alert("working");
           // Clear the existing table content
           $('#empTable tbody').empty();
+
+          let sn = 1;
 
           // Populate the table with new data
           response.forEach(function(item) {
             var row = `
                         <tr>
+                            <td><input type="checkbox" class="form-check-input"></td>
+                            <td>${sn++}</td>
                             <td>${item.name}</td>
                             <td>${item.rolename}</td>
                             <td>${item.mobile}</td>
+                            <td>${item.email}</td>
+                            <td>${item.username}</td>
+                            <td>
+                              <button type="button" class="btn btn-success" onclick="changestatus(${item.empID}, ${item.employee_status})">Change</button>
+                            </td><td class="row">
+                            <div class="dropdown">
+                              <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Action
+                              </button>
+                              <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#target-paragraph" onclick="edit(${item.empID})">Edit</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="delEmployee(${item.empID})">Delete</a></li>
+                              </ul>
+                            </div>
+                    </td>
                         </tr>
                     `;
             $('#empTable tbody').append(row);
