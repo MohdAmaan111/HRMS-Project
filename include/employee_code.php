@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] == 'filterdata') {
 
     // Bind parameters
     if (!empty($emp_name)) {
-        $emp_name = "%" . $emp_name . "%"; // Add wildcards for LIKE
+        $emp_name = "%" . $emp_name . "%"; // Add wildcards for partial matching
         $stmt->bindParam(':emp_name', $emp_name, PDO::PARAM_STR);
     }
     if (!empty($role)) {
@@ -52,7 +52,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] == 'filterdata') {
 
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    echo json_encode($results);
+
+    // Check if results are empty
+    if (empty($results)) {
+        echo json_encode(['status' => 'error']);
+    } else {
+        echo json_encode(['status' => 'success', 'data' => $results]);
+    }
     exit;
 }
 

@@ -101,7 +101,7 @@ $name = $employeeID = $role = $mobile = $email = $username = $password = "";
               <div class="row">
 
                 <div class="col-md-3 custom-select">
-                  <input type="text" class="custom-select-input form-select" placeholder="Select employee...">
+                  <input type="text" name="filter_emp" class="custom-select-input form-select" placeholder="Select employee...">
                   <div class="custom-select-options">
                     <?php
                     $sql = "SELECT * FROM employee";
@@ -256,15 +256,16 @@ require 'footer.php';
       dataType: 'json',
 
       success: function(response) {
-        if (response.length > 0) {
-          // alert("working");
+        if (response.status === 'success') {
+          const employees = response.data;
+
           // Clear the existing table content
           $('#empTable tbody').empty();
 
           let sn = 1;
 
           // Populate the table with new data
-          response.forEach(function(item) {
+          employees.forEach(function(item) {
             var row = `
                         <tr>
                             <td><input type="checkbox" class="form-check-input"></td>
@@ -291,6 +292,15 @@ require 'footer.php';
                     `;
             $('#empTable tbody').append(row);
           });
+        } else if (response.status === 'error') {
+          // Clear the table and show a "No data found" message
+          $('#empTable tbody').empty();
+          var noDataRow = `
+                    <tr>
+                        <td colspan="9" class="text-center">No data found</td>
+                    </tr>
+                `;
+          $('#empTable tbody').append(noDataRow);
         }
 
         // Update the UI or provide feedback
