@@ -17,10 +17,42 @@ $name = $employeeID = $role = $mobile = $email = $username = $password = "";
     </nav>
   </div><!-- End Page Title -->
 
+  <!-- Modal -->
+  <div class="modal fade" id="selectedEmployeesModal" tabindex="-1" aria-labelledby="selectedEmployeesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="selectedEmployeesModalLabel">Selected Employees</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Employee ID</th>
+                <th>Employee Name</th>
+              </tr>
+            </thead>
+            <tbody id="selectedEmployeesList">
+              <!-- Selected employee data will be appended here -->
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="confirmDelete" class="btn btn-danger">Confirm Delete</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <div class="nav-item">
 
     <span>Register as an Employee</span>
     <button type="button" class="btn btn-primary" onclick="add()">Add<i class="bi bi-plus ms-auto"></i></button>
+    <button id="delete_button" class="btn btn-danger" disabled>Delete</button>
+
     <span style="color: red;"><?php echo $inputErr; ?></span>
 
     <div class="collapse" id="employee_form">
@@ -147,6 +179,7 @@ $name = $employeeID = $role = $mobile = $email = $username = $password = "";
 
                 <div class="col-md-2">
                   <button type="submit" class="btn btn-dark">Filter</button>
+                  <button type="button" class="btn btn-secondary" id="reset_button">Reset</button>
                 </div>
               </div>
             </form>
@@ -186,8 +219,8 @@ $name = $employeeID = $role = $mobile = $email = $username = $password = "";
                     $bg = 'table-danger';
                   }
                 ?>
-                  <tr class="<?php echo $bg; ?>">
-                    <td><input type="checkbox" class="form-check-input" name="empId[]" value="<?php echo $row['empID']; ?>"></td>
+                  <tr class="<?= $bg; ?>" data-id="<?= $row['empID']; ?>">
+                    <td><input type="checkbox" class="form-check-input" name="empId[]" value="<?= $row['empID']; ?>"></td>
                     <td><?php echo $sn++; ?></td>
                     <td><?php echo $row['name']; ?></td>
                     <td><?php echo $row['rolename']; ?></td>
@@ -236,6 +269,10 @@ require 'footer.php';
 
   var cancel = function() {
     $('#employee_form').collapse('hide');
+  }
+
+  var resetFilter = function() {
+    // $('#employee_form').collapse('hide');
   }
 
   $('#filter_form').on('submit', function(e) {
@@ -313,6 +350,149 @@ require 'footer.php';
       },
       error: function() {
         $('#response').html('<p>An error occurred. Please try again.</p>');
+      }
+    });
+  });
+
+  $('#reset_button').on('click', function() {
+    // Clear the table content
+    $('#empTable tbody').empty();
+
+    // Optionally, reload the initial data
+    $.ajax({
+      url: 'include/employee_code.php',
+      type: 'POST',
+      data: {
+        action: 'resetFilter'
+      }, // Modify 'loadAllData' to match your backend logic
+      dataType: 'json',
+      success: function(response) {
+        const employees = response;
+
+        let sn = 1;
+
+        employees.forEach(function(item) {
+          let bg = 'table-primary';
+          if (item.employee_status == 0) {
+            bg = 'table-danger';
+          }
+          var row = `
+                        <tr class="${bg}">
+                            <td><input type="checkbox" class="form-check-input"></td>
+                            <td>${sn++}</td>
+                            <td>${item.name}</td>
+                            <td>${item.rolename}</td>
+                            <td>${item.mobile}</td>
+                            <td>${item.email}</td>
+                            <td>${item.username}</td>
+                            <td>
+                                <button type="button" class="btn btn-success" onclick="changestatus(${item.empID}, ${item.employee_status})">Change</button>
+                            </td>
+                            <td class="row">
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Action
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#target-paragraph" onclick="edit(${item.empID})">Edit</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="delEmployee(${item.empID})">Delete</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+          $('#empTable tbody').append(row);
+        });
+      }
+    });
+  });
+
+  $('#empTable').on('change', '.form-check-input', function() {
+    const selectedCheckboxes = $('.form-check-input:checked');
+    const deleteButton = $('#delete_button');
+
+    // Enable or disable the delete button
+    if (selectedCheckboxes.length > 0) {
+      deleteButton.prop('disabled', false);
+    } else {
+      deleteButton.prop('disabled', true);
+    }
+  });
+
+  $('#delete_button').on('click', function() {
+    const selectedEmployees = [];
+    selectedEmployeeIds = [];
+
+    // Collect selected employee IDs
+    $('.form-check-input:checked').each(function() {
+      const row = $(this).closest('tr'); // Get the corresponding row
+      const empId = row.data('id'); // Assuming employee ID is stored in a data attribute
+      const empName = row.find('td:nth-child(3)').text(); // Assuming name is in the 3rd column
+
+      selectedEmployees.push({
+        empId,
+        empName
+      });
+      selectedEmployeeIds.push(empId); // Store the IDs
+    });
+
+    // Populate the modal
+    const employeesList = $('#selectedEmployeesList');
+    employeesList.empty(); // Clear previous list
+    // Show the selected employees
+    if (selectedEmployees.length > 0) {
+      selectedEmployees.forEach(function(employee) {
+        employeesList.append(`
+                    <tr>
+                        <td>${employee.empId}</td>
+                        <td>${employee.empName}</td>
+                    </tr>
+                `);
+      });
+
+      // Show the modal
+      $('#selectedEmployeesModal').modal('show');
+    } else {
+      alert('No employees selected.');
+    }
+  });
+
+
+  // Handle confirm delete
+  $('#confirmDelete').on('click', function() {
+    swal({
+      title: "Are you sure?",
+      text: "Do you really want to delete this employee? This action cannot be undone.",
+      icon: "warning",
+      buttons: ["Cancel", "Delete"],
+      dangerMode: true,
+    }).then((willDelete) => {
+      if (willDelete) {
+        const employeeIds = selectedEmployeeIds.join(',');
+
+        $.ajax({
+          type: 'POST',
+          url: 'include/employee_code.php',
+          data: {
+            action: 'delete',
+            employeeIds: employeeIds
+          },
+          cache: false,
+          success: function(response) {
+            var d = JSON.parse(response);
+            if (d.status == 'success') {
+              // Sweet alert for success
+              swal({
+                title: "Employee Deleted Successfully!",
+                icon: "success",
+                button: "OK",
+              }).then(() => {
+                // Reload the page after the alert is closed
+                window.location.reload();
+              });
+            }
+          }
+        });
       }
     });
   });

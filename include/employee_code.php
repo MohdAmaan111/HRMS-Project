@@ -62,6 +62,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] == 'filterdata') {
     exit;
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] == 'resetFilter') {
+    // Construct the base SQL query
+    $sql = "SELECT * FROM employee INNER JOIN role ON role.roleID=employee.role WHERE 1=1";
+
+    // Prepare and execute the query
+    $stmt = $conn->prepare($sql);
+
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode($results);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] == 'adddata') {
     // echo "<pre>";
     // print_r($_POST);
@@ -150,22 +164,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'delete') {
-    $sql = "SELECT * FROM employee WHERE empID = :id";
-    $stmt = $conn->prepare($sql);
-    $param1 = array(
-        ':id' => $_POST['id'],
-    );
-    $stmt->execute($param1);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $employeeIds = $_POST['employeeIds'];
 
-    $sql = "DELETE FROM employee WHERE empID = :id";
-    $stmt = $conn->prepare($sql);
-    $param = array(
-        ':id' => $_POST['id'],
-    );
-    $stmt->execute($param);
-    echo json_encode(array("statusCode" => 200));
-    exit;
+    if (!empty($employeeIds)) {
+        // Construct query directly
+        $query = "DELETE FROM employee WHERE empID IN ($employeeIds)";
+        if ($conn->query($query)) {
+            echo json_encode(['status' => 'success', 'message' => 'Employees deleted successfully']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Error deleting employees']);
+        }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'No employee IDs provided']);
+    }
 }
 /**
  * Function to assign default leave types to a new employee
