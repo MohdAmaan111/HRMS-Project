@@ -42,10 +42,6 @@ if (!isset($_SESSION['fullname'])) {
   <!-- jQuery File -->
   <script src="assets/jquery/jquery.min.js"></script>
 
-  <!-- select2 CSS File -->
-  <!-- <link src="assets/select2/select2.min.css" rel="stylesheet"></link> -->
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
 </head>
 
 <body>

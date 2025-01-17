@@ -133,7 +133,7 @@ $name = $employeeID = $role = $mobile = $email = $username = $password = "";
               <div class="row">
 
                 <div class="col-md-3 custom-select">
-                  <input type="text" name="filter_emp" class="custom-select-input form-select" placeholder="Select employee...">
+                  <input type="text" name="filter_emp" class="custom-select-input form-select" placeholder="Select employee..." autocomplete="off">
                   <div class="custom-select-options">
                     <?php
                     $sql = "SELECT * FROM employee";
