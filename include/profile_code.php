@@ -15,7 +15,7 @@ $sql = "CREATE TABLE IF NOT EXISTS personal_details (
     phone VARCHAR(20) UNIQUE,
     email VARCHAR(50) UNIQUE,
     twitter VARCHAR(50) NULL,
-    facebook VARCHAR(50) NULL,
+    github VARCHAR(50) NULL,
     instagram VARCHAR(50) NULL,
     linkedin VARCHAR(50) NULL,
     last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -24,13 +24,13 @@ $conn->exec($sql);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'profile') {
     // echo "<pre>";
-    // print_r($_POST);
+    // print_r($_POST); // Check if other POST data is received
     // echo "Your user id is = " . $_SESSION['userid'];
     // echo "</pre>";
 
     echo '<pre>';
-    print_r($_POST); // Check if other POST data is received
     print_r($_FILES); // Check the contents of $_FILES
+    echo "Your profile name is " . $_FILES['image']['name'];
     echo '</pre>';
 
     if (isset($_SESSION['userid'])) {
@@ -44,11 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         $phone = $_POST["phone"];
         $email = $_POST["email"];
         $twitter = $_POST["twitter"];
-        $facebook = $_POST["facebook"];
+        $github = $_POST["github"];
         $instagram = $_POST["instagram"];
         $linkedin = $_POST["linkedin"];
 
-        // echo "<script>alert('Your user id is " . $profileID . "');</script>";
+        $uploadFile = basename($_FILES['image']['name']);
 
         $sql = "SELECT * FROM personal_details WHERE profile_id={$_SESSION['userid']}";
         $stmt = $conn->prepare($sql);
@@ -62,15 +62,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             $sql = "UPDATE personal_details 
                     SET about = :about, fullname = :fullname, company = :company, job = :job, 
                         country = :country, address = :address, phone = :phone, email = :email, 
-                        twitter = :twitter, facebook = :facebook, instagram = :instagram , 
+                        twitter = :twitter, github = :github, instagram = :instagram , 
                         linkedin = :linkedin 
                     WHERE profile_id = :id";
         } else {
             $sql = "INSERT INTO personal_details 
                     (profile_id, fullName, about, company, job, country, address, phone, email, twitter, 
-                    facebook, instagram, linkedin) 
+                    github, instagram, linkedin) 
                     VALUES (:id, :fullname, :about, :company, :job, :country, :address, :phone, :email, 
-                    :twitter, :facebook, :instagram, :linkedin)";
+                    :twitter, :github, :instagram, :linkedin)";
         }
 
         $stmt = $conn->prepare($sql);
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             ':phone' => $phone,
             ':email' => $email,
             ':twitter' => $twitter,
-            ':facebook' => $facebook,
+            ':github' => $github,
             ':instagram' => $instagram,
             ':linkedin' => $linkedin,
         ];

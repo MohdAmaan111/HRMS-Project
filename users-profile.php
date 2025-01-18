@@ -30,7 +30,7 @@ require 'include/profile_code.php';
   $phone = $results['phone'] ?? "";
   $email = $results['email'] ?? "";
   $twitter = $results['twitter'] ?? "";
-  $facebook = $results['facebook'] ?? "";
+  $github = $results['github'] ?? "";
   $instagram = $results['instagram'] ?? "";
   $linkedin = $results['linkedin'] ?? "";
   ?>
@@ -44,12 +44,12 @@ require 'include/profile_code.php';
 
             <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
             <h2><?php echo $_SESSION['fullname']; ?></h2>
-            <h3>Web Designer</h3>
+            <h3><?= $job; ?></h3>
             <div class="social-links mt-2">
-              <a href="<?php echo $twitter; ?>" class="twitter"><i class="bi bi-twitter"></i></a>
-              <a href="<?php echo $facebook; ?>" class="facebook"><i class="bi bi-facebook"></i></a>
+              <a href="<?php echo $twitter; ?>" class="twitter" target="_blank"><i class="bi bi-twitter"></i></a>
+              <a href="<?php echo $github; ?>" class="github" target="_blank"><i class="bi bi-github"></i></a>
               <a href="<?php echo $instagram; ?>" class="instagram" target="_blank"><i class="bi bi-instagram"></i></a>
-              <a href="<?php echo $linkedin; ?>" class="linkedin"><i class="bi bi-linkedin"></i></a>
+              <a href="<?php echo $linkedin; ?>" class="linkedin" target="_blank"><i class="bi bi-linkedin"></i></a>
             </div>
           </div>
         </div>
@@ -131,8 +131,10 @@ require 'include/profile_code.php';
 
                 <div id="response"></div>
                 <!-- Edit Form -->
-                <form id="profile_form" method="post" enctype="multipart/form-data">
+                <form id="profile_form" method="POST" enctype="multipart/form-data">
+
                   <div class="row mb-3">
+
                     <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
                     <div class="col-md-8 col-lg-9">
                       <img src="assets/img/profile-img.jpg" alt="Profile" id="profilePreview">
@@ -140,7 +142,7 @@ require 'include/profile_code.php';
                         <button type="button" class="btn btn-primary btn-sm" id="uploadButton">
                           <i class="bi bi-upload"></i>
                         </button>
-                        <input type="file" name="profile" id="fileInput" style="display: none;">
+                        <input type="file" name="image" accept="image/*" id="fileInput" style="display: none;">
 
                         <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a>
                       </div>
@@ -211,9 +213,9 @@ require 'include/profile_code.php';
                   </div>
 
                   <div class="row mb-3">
-                    <label for="Facebook" class="col-md-4 col-lg-3 col-form-label">Facebook Profile</label>
+                    <label for="github" class="col-md-4 col-lg-3 col-form-label">Github Profile</label>
                     <div class="col-md-8 col-lg-9">
-                      <input name="facebook" type="text" class="form-control" id="Facebook" value="<?php echo $facebook; ?>">
+                      <input name="github" type="text" class="form-control" id="github" value="<?php echo $github; ?>">
                     </div>
                   </div>
 
@@ -405,20 +407,26 @@ require 'footer.php';
     e.preventDefault(); // Prevent the default form submission
 
     // Serialize the form data
-    var formData = $(this).serialize();
+    // var formData = $(this).serialize();
+    var formData = new FormData(document.getElementById('profile_form'));
     // alert(formData);
 
     // Append the action to the serialized data
-    formData += '&action=profile';
+    // formData += '&action=profile';
+
+    // Append custom data (e.g., 'action')
+    formData.append('action', 'profile');
 
     // AJAX request
     $.ajax({
       url: 'include/profile_code.php', // The server-side script to handle the form data
       type: 'POST',
       data: formData,
+      processData: false, // Prevent jQuery from converting FormData to a string
+      contentType: false, // Ensure the correct Content-Type for file uploads
       success: function(response) {
         // Update the UI or provide feedback
-        // $('#response').html('<p>' + response + '</p>');
+        $('#response').html('<p>' + response + '</p>');
         swal({
           title: "Information updated successfully!",
           icon: "success",

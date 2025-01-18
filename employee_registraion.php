@@ -149,7 +149,7 @@ $name = $employeeID = $role = $mobile = $email = $username = $password = "";
 
                 <div class="col-md-3">
                   <select class="form-select" aria-label="Default select example" name="filter_role" id="filterRole">
-                    <option selected value="" disabled>Select Role</option>
+                    <option selected value="">Select Role</option>
                     <?php
                     $sql = "SELECT * FROM role";
                     $stmt = $conn->prepare($sql);
@@ -164,7 +164,7 @@ $name = $employeeID = $role = $mobile = $email = $username = $password = "";
 
                 <div class="col-md-3">
                   <select class="form-select" aria-label="Default select example" name="filter_dept" id="filterDept">
-                    <option selected value="" disabled>Select Department</option>
+                    <option selected value="">Select Department</option>
                     <?php
                     $sql = "SELECT * FROM department";
                     $stmt = $conn->prepare($sql);
