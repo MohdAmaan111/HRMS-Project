@@ -1,5 +1,6 @@
 <?php
 include_once('config.php');
+// include_once('./upload');
 
 $fullName = "";
 
@@ -7,6 +8,7 @@ $fullName = "";
 $sql = "CREATE TABLE IF NOT EXISTS personal_details (
     profile_id INT(6) PRIMARY KEY,
     fullname VARCHAR(30) NULL,
+    image VARCHAR(150) NULL,
     about VARCHAR(120) NULL,
     company VARCHAR(60) NULL,
     job VARCHAR(50) NULL,
@@ -28,10 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     // echo "Your user id is = " . $_SESSION['userid'];
     // echo "</pre>";
 
-    echo '<pre>';
-    print_r($_FILES); // Check the contents of $_FILES
-    echo "Your profile name is " . $_FILES['image']['name'];
-    echo '</pre>';
+    // echo '<pre>';
+    // print_r($_FILES); // Check the contents of $_FILES
+    // echo "Your profile name is " . $_FILES['image']['name'];
+    // echo '</pre>';
 
     if (isset($_SESSION['userid'])) {
         $profileID = $_SESSION['userid'];
@@ -48,35 +50,61 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         $instagram = $_POST["instagram"];
         $linkedin = $_POST["linkedin"];
 
-        $uploadFile = basename($_FILES['image']['name']);
-
         $sql = "SELECT * FROM personal_details WHERE profile_id={$_SESSION['userid']}";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $results = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $currentImage = $results['image'] ?? "default.jpg";
+
+        // Handle image upload if a new file is provided
+        if (!empty($_FILES['image'])) {
+            $uniquePrefix = uniqid($profileID . '_', true); // Combines user ID with a unique identifier
+            $imageName = $uniquePrefix . '_image.jpg';
+            // $imageName = $_FILES['image']['name'];
+            // $imageName = str_replace("'", "", $imageName); // Remove single quotes
+            // $imageName = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', $imageName); // Replace other invalid characters with underscores
+
+            $imageTmpName = $_FILES['image']['tmp_name'];
+            $folder = '../upload/userProfile/' . $imageName;
+
+            if (!is_dir($folder)) {
+                // echo "<h2>Directory is not present</h2>";
+            } else {
+                // echo "<h2>Directory is present</h2>";
+            }
+
+            //echo "Target file path: " . $folder; // Debugging purpose
+
+            //move an uploaded file from its temporary location to a new destination on the server
+            if (move_uploaded_file($imageTmpName, $folder)) {
+                // Delete old image if not the default
+                if ($currentImage !== "default.jpg" && file_exists('../upload/userProfile/' . $currentImage)) {
+                    unlink('../upload/userProfile/' . $currentImage);
+                }
+
+                $currentImage = $imageName; // Update current image to the new one
+            }
+        }
 
         // echo "<pre>";
         // echo print_r($results);
         // echo "</pre>";
         if ($results) {
             $sql = "UPDATE personal_details 
-                    SET about = :about, fullname = :fullname, company = :company, job = :job, 
-                        country = :country, address = :address, phone = :phone, email = :email, 
-                        twitter = :twitter, github = :github, instagram = :instagram , 
-                        linkedin = :linkedin 
+                    SET about = :about, fullname = :fullname, image = :image, company = :company, job = :job, country = :country, address = :address, phone = :phone, email = :email, twitter = :twitter, github = :github, instagram = :instagram , linkedin = :linkedin 
                     WHERE profile_id = :id";
         } else {
             $sql = "INSERT INTO personal_details 
-                    (profile_id, fullName, about, company, job, country, address, phone, email, twitter, 
-                    github, instagram, linkedin) 
-                    VALUES (:id, :fullname, :about, :company, :job, :country, :address, :phone, :email, 
-                    :twitter, :github, :instagram, :linkedin)";
+                    (profile_id, fullName, image, about, company, job, country, address, phone, email, twitter, github, instagram, linkedin) 
+                    VALUES (:id, :fullname, :image, :about, :company, :job, :country, :address, :phone, :email, :twitter, :github, :instagram, :linkedin)";
         }
 
         $stmt = $conn->prepare($sql);
         $parameters = [
             ':id' => $profileID,
             ':fullname' => $fullName,
+            ':image' => $currentImage,
             ':about' => $about,
             ':company' => $company,
             ':job' => $job,

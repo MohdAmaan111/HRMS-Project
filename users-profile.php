@@ -22,6 +22,7 @@ require 'include/profile_code.php';
   $stmt = $conn->prepare($sql);
   $stmt->execute();
   $results = $stmt->fetch(PDO::FETCH_ASSOC);
+  $image = $results['image'] ?? "default.jpg";
   $about = $results['about'] ?? "";
   $company = $results['company'] ?? "";
   $job = $results['job'] ?? "";
@@ -42,8 +43,8 @@ require 'include/profile_code.php';
         <div class="card">
           <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
 
-            <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-            <h2><?php echo $_SESSION['fullname']; ?></h2>
+            <img src="upload/userProfile/<?php echo $image; ?>" alt="Profile" class="rounded-circle">
+            <h2><?= $_SESSION['fullname']; ?></h2>
             <h3><?= $job; ?></h3>
             <div class="social-links mt-2">
               <a href="<?php echo $twitter; ?>" class="twitter" target="_blank"><i class="bi bi-twitter"></i></a>
@@ -137,7 +138,7 @@ require 'include/profile_code.php';
 
                     <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
                     <div class="col-md-8 col-lg-9">
-                      <img src="assets/img/profile-img.jpg" alt="Profile" id="profilePreview">
+                      <img src="upload/userProfile/<?= $image; ?>" alt="Profile" id="profilePreview">
                       <div class="pt-2">
                         <button type="button" class="btn btn-primary btn-sm" id="uploadButton">
                           <i class="bi bi-upload"></i>
@@ -433,7 +434,7 @@ require 'footer.php';
           button: "OK",
         }).then(() => {
           // Reload the page after the alert is closed
-          // window.location.reload();
+          window.location.reload();
         });
       },
       error: function() {
